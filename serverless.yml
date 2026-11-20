@@ -14,6 +14,8 @@ provider:
   environment:
     # Name of the DynamoDB Posts table, including the deployment stage.
     POSTS_TABLE: ShuiPosts-${sls:stage}
+    USERS_TABLE: ShuiUsers-${sls:stage}
+    COMMENTS_TABLE: ShuiComments-${sls:stage}
 
 resources:
   Resources:
@@ -63,3 +65,37 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+   
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ShuiUsers-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+
+        AttributeDefinitions:
+          - AttributeName: username
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: username
+            KeyType: HASH
+
+    CommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ShuiComments-${sls:stage}
+        BillingMode: PAY_PER_REQUEST
+
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+          - AttributeName: commentId
+            AttributeType: S
+
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+          - AttributeName: commentId
+            KeyType: RANGE
+
+            
