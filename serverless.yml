@@ -1,3 +1,4 @@
+
 service: shui
 
 frameworkVersion: '4'
@@ -7,3 +8,58 @@ provider:
   runtime: nodejs22.x
   region: eu-north-1
   stage: dev
+
+  # Environment variables shared with Lambda functions.
+  # Keeps database table names configurable instead of hardcoding them.
+  environment:
+    # Name of the DynamoDB Posts table, including the deployment stage.
+    POSTS_TABLE: ShuiPosts-${sls:stage}
+
+resources:
+  Resources:
+    PostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        # Table name changes depending on the deployment stage.
+        TableName: ShuiPosts-${sls:stage}
+
+        # AWS charges based on actual database requests.
+        BillingMode: PAY_PER_REQUEST
+
+        # Attributes used by the primary key and secondary indexes.
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: GSI1PK
+            AttributeType: S
+          - AttributeName: GSI1SK
+            AttributeType: S
+          - AttributeName: GSI2PK
+            AttributeType: S
+          - AttributeName: GSI2SK
+            AttributeType: S
+
+        # Primary key: unique identifier for each post.
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+        # Additional indexes for retrieving posts efficiently.
+        GlobalSecondaryIndexes:
+          - IndexName: PostsByDateIndex
+            KeySchema:
+              - AttributeName: GSI1PK
+                KeyType: HASH
+              - AttributeName: GSI1SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+          - IndexName: PostsByUsernameIndex
+            KeySchema:
+              - AttributeName: GSI2PK
+                KeyType: HASH
+              - AttributeName: GSI2SK
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
