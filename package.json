@@ -9,5 +9,16 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1173.0",
+    "@aws-sdk/lib-dynamodb": "^3.1173.0",
+    "@middy/core": "^7.9.2",
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.6.7"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true
+  }
 }
