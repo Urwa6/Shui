@@ -9,6 +9,22 @@ provider:
   region: eu-north-1
   stage: dev
 
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - !GetAtt PostsTable.Arn
+            - !GetAtt UsersTable.Arn
+            - !GetAtt CommentsTable.Arn
+            - !Sub "${PostsTable.Arn}/index/*"
+
   # Environment variables shared with Lambda functions.
   # Keeps database table names configurable instead of hardcoding them.
   environment:
@@ -16,6 +32,21 @@ provider:
     POSTS_TABLE: ShuiPosts-${sls:stage}
     USERS_TABLE: ShuiUsers-${sls:stage}
     COMMENTS_TABLE: ShuiComments-${sls:stage}
+
+functions:
+  register:
+    handler: src/handlers/auth/register.handler
+    events:
+      - httpApi:
+          path: /auth/register
+          method: POST
+
+  login:
+    handler: src/handlers/auth/login.handler
+    events:
+      - httpApi:
+          path: /auth/login
+          method: POST
 
 resources:
   Resources:
