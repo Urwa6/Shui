@@ -7,6 +7,7 @@ const client = new DynamoDBClient({});
 //Create the document client for working with Javascript objects
 export const dynamoDb = DynamoDBDocumentClient.from(client, {
     marshallOptions: {
-        removeUndefinedValues: true, // Remove undefined values while marshalling.
+        // Remove undefined values while marshalling.
+        removeUndefinedValues: true, 
     },
 });
