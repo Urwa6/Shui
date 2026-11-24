@@ -1,7 +1,8 @@
-
 service: shui
 
 frameworkVersion: '4'
+
+useDotenv: true
 
 provider:
   name: aws
@@ -32,6 +33,7 @@ provider:
     POSTS_TABLE: ShuiPosts-${sls:stage}
     USERS_TABLE: ShuiUsers-${sls:stage}
     COMMENTS_TABLE: ShuiComments-${sls:stage}
+    JWT_SECRET: ${env:JWT_SECRET}
 
 functions:
   register:
