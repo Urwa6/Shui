@@ -1,0 +1,71 @@
+import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "node:crypto";
+import { dynamoDb } from "./dynamodb.js";
+
+const POSTS_TABLE = process.env.POSTS_TABLE;
+
+// Retrieve all posts, optionally filtered by username
+export const getAllPosts = async (username) => {
+  let params;
+
+  if (username) {
+    // Retrieve posts belonging to a specific user
+    params = {
+      TableName: POSTS_TABLE,
+      IndexName: "PostsByUsernameIndex",
+      KeyConditionExpression: "GSI2PK = :username",
+      ExpressionAttributeValues: {
+        ":username": username,
+      },
+      ScanIndexForward: false,
+    };
+  } else {
+    // Retrieve all posts, newest first
+    params = {
+      TableName: POSTS_TABLE,
+      IndexName: "PostsByDateIndex",
+      KeyConditionExpression: "GSI1PK = :partition",
+      ExpressionAttributeValues: {
+        ":partition": "POSTS",
+      },
+      ScanIndexForward: false,
+    };
+  }
+
+  const result = await dynamoDb.send(
+    new QueryCommand(params)
+  );
+
+  return result.Items ?? [];
+};
+
+//Create and save a new post in the database
+export const createPost = async ({username, title, content}) => {
+    const  id = randomUUID();
+    const createdAt = new Date().toISOString();
+
+    const post = {
+        id,
+        username,
+        title,
+        content,
+        createdAt,
+        isGuest: false,
+
+        //Attributes used by the DynamoDB indexes 
+        GSI1PK: "POSTS",
+        GSI1SK: `${createdAt}#${id}`,
+        GSI2PK: username,
+        GSI2SK: `${createdAt}#${id}`,
+      };
+
+      await dynamoDb.send(
+        new PutCommand({
+          TableName: POSTS_TABLE,
+          Item: post,
+          ConditionExpression: "attribute_not_exists(id)", // Ensure no duplicate post IDs
+        })
+     );
+
+     return post;
+};
