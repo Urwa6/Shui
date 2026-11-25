@@ -49,7 +49,7 @@ functions:
       - httpApi:
           path: /auth/login
           method: POST
-
+  
   createPost:
     handler: src/handlers/posts/create.handler
     events:
@@ -57,7 +57,7 @@ functions:
           path: /posts
           method: POST
 
-    getAllPosts:
+  getAllPosts:
     handler: src/handlers/posts/getAll.handler
     events:
       - httpApi:
@@ -70,7 +70,18 @@ functions:
       - httpApi:
           path: /posts/{postId}
           method: GET
-               
+
+  updatePost:
+    handler: src/handlers/posts/update.handler
+    events:
+      - httpApi:
+          path: /posts/{postId}
+          method: PUT
+
+
+
+
+
 resources:
   Resources:
     PostsTable:

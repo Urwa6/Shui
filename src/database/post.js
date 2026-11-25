@@ -1,4 +1,9 @@
-import { QueryCommand, PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { 
+  QueryCommand, 
+  PutCommand,
+  GetCommand,
+  UpdateCommand,
+ } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "node:crypto";
 import { dynamoDb } from "./dynamodb.js";
 
@@ -80,4 +85,26 @@ export const getPostById = async (postId) => {
   );
 
   return result.Item;
+};
+// Update the title and content of an existing post
+export const updatePost = async ({ postId, title, content }) => {
+  const updatedAt = new Date().toISOString();
+
+  const result = await dynamoDb.send(
+    new UpdateCommand({
+      TableName: POSTS_TABLE,
+      Key: { id: postId },
+      UpdateExpression:
+        "SET title = :title, content = :content, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":title": title,
+        ":content": content,
+        ":updatedAt": updatedAt,
+      },
+      ConditionExpression: "attribute_exists(id)",
+      ReturnValues: "ALL_NEW",
+    })
+  );
+
+  return result.Attributes;
 };
