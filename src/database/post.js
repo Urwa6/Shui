@@ -3,6 +3,7 @@ import {
   PutCommand,
   GetCommand,
   UpdateCommand,
+  DeleteCommand,
  } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "node:crypto";
 import { dynamoDb } from "./dynamodb.js";
@@ -107,4 +108,15 @@ export const updatePost = async ({ postId, title, content }) => {
   );
 
   return result.Attributes;
+};
+
+// Delete a post by its ID
+export const deletePost = async (postId) => {
+  await dynamoDb.send(
+    new DeleteCommand({
+      TableName: POSTS_TABLE,
+      Key: { id: postId },
+      ConditionExpression: "attribute_exists(id)",
+    })
+  );
 };

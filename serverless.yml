@@ -77,6 +77,13 @@ functions:
       - httpApi:
           path: /posts/{postId}
           method: PUT
+            
+  deletePost:
+    handler: src/handlers/posts/delete.handler
+    events:
+      - httpApi:
+          path: /posts/{postId}
+          method: DELETE
 
 
 
