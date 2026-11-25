@@ -1,4 +1,4 @@
-import { QueryCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { QueryCommand, PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "node:crypto";
 import { dynamoDb } from "./dynamodb.js";
 
@@ -68,4 +68,16 @@ export const createPost = async ({username, title, content}) => {
      );
 
      return post;
+};
+
+// Retrieve one post by its ID
+export const getPostById = async (postId) => {
+  const result = await dynamoDb.send(
+    new GetCommand({
+      TableName: POSTS_TABLE,
+      Key: { id: postId },
+    })
+  );
+
+  return result.Item;
 };

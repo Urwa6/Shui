@@ -11,11 +11,7 @@ export const authenticate = () => ({
 
     // Check that the Authorization header exists
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      request.response = errorResponse(
-        401,
-        "Authentication required"
-      );
-      return;
+      return errorResponse(401, "Authentication required");
     }
 
     const token = authHeader.split(" ")[1];
@@ -31,10 +27,7 @@ export const authenticate = () => ({
       request.event.user = decoded;
 
     } catch {
-      request.response = errorResponse(
-        401,
-        "Invalid or expired token"
-      );
+      return errorResponse(401, "Invalid or expired token");
     }
   },
 });

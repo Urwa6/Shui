@@ -50,6 +50,27 @@ functions:
           path: /auth/login
           method: POST
 
+  createPost:
+    handler: src/handlers/posts/create.handler
+    events:
+      - httpApi:
+          path: /posts
+          method: POST
+
+    getAllPosts:
+    handler: src/handlers/posts/getAll.handler
+    events:
+      - httpApi:
+          path: /posts
+          method: GET
+
+  getPost:
+    handler: src/handlers/posts/getById.handler
+    events:
+      - httpApi:
+          path: /posts/{postId}
+          method: GET
+               
 resources:
   Resources:
     PostsTable:
