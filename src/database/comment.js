@@ -1,4 +1,3 @@
-
 import {
   PutCommand,
   QueryCommand,
@@ -10,22 +9,31 @@ import { dynamoDb } from "./dynamodb.js";
 
 const COMMENTS_TABLE = process.env.COMMENTS_TABLE;
 
-// Retrieve all comments belonging to a post.
-export const getCommentsByPostId = async (postId) => {
-  const result = await dynamoDb.send(
-    new QueryCommand({
-      TableName: COMMENTS_TABLE,
-      KeyConditionExpression: "postId = :postId",
-      ExpressionAttributeValues: {
-        ":postId": postId,
-      },
-    })
-  );
 
-  return result.Items ?? [];
+export const getCommentsByPostId = async (postId) => {
+  const comments = [];
+  let lastEvaluatedKey;
+
+  do {
+    const result = await dynamoDb.send(
+      new QueryCommand({
+        TableName: COMMENTS_TABLE,
+        KeyConditionExpression: "postId = :postId",
+        ExpressionAttributeValues: {
+          ":postId": postId,
+        },
+        ExclusiveStartKey: lastEvaluatedKey,
+      })
+    );
+
+    comments.push(...(result.Items ?? []));
+    lastEvaluatedKey = result.LastEvaluatedKey;
+  } while (lastEvaluatedKey);
+
+  return comments;
 };
 
-// Create and save a comment.
+//Create and save a comment.
 export const createComment = async ({
   postId,
   username,
@@ -51,7 +59,7 @@ export const createComment = async ({
   return comment;
 };
 
-// Delete all comments belonging to a post.
+//Delete all comments belonging to a post.
 export const deleteCommentsByPostId = async (postId) => {
   let lastEvaluatedKey;
 

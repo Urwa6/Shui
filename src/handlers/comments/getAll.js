@@ -9,7 +9,7 @@ import {
   errorResponse,
 } from "../../utils/response.js";
 
-// Handle GET /posts/{postId}/comments
+//Handle GET /posts/{postId}/comments
 export const handler = async (event) => {
   try {
     const postId = event.pathParameters?.postId;
@@ -18,14 +18,14 @@ export const handler = async (event) => {
       return errorResponse(400, "Post ID is required");
     }
 
-    // Check that the post exists.
+    //Check that the post exists.
     const post = await getPostById(postId);
 
     if (!post) {
       return errorResponse(404, "Post not found");
     }
 
-    // Retrieve comments belonging to this post.
+    //Retrieve comments belonging to this post.
     const comments = await getCommentsByPostId(postId);
 
     return successResponse(200, comments);

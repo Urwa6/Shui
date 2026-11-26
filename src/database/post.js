@@ -61,6 +61,7 @@ export const createPost = async ({
         title,
         content,
         createdAt,
+        updatedAt: createdAt,
         isGuest,
 
         //Attributes used by the DynamoDB indexes 

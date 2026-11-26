@@ -5,7 +5,6 @@ import { z } from "zod";
 import { createComment } from "../../database/comment.js";
 import { getPostById } from "../../database/post.js";
 import { authenticate } from "../../middleware/auth.js";
-
 import {
   successResponse,
   errorResponse,
@@ -13,10 +12,14 @@ import {
 
 // Validate the comment content.
 const commentSchema = z.object({
-  content: z.string().trim().min(1, "Comment content is required"),
+  content: z
+  .string()
+  .trim()
+  .min(1, "Comment content is required")
+  .max(1000, "Comment cannot exceed 1000 characters"),
 });
 
-// Handle POST /posts/{postId}/comments
+//Handle POST /posts/{postId}/comments
 const createCommentHandler = async (event) => {
   try {
     const postId = event.pathParameters?.postId;
@@ -42,14 +45,14 @@ const createCommentHandler = async (event) => {
       );
     }
 
-    // Check that the post exists.
+    //Check that the post exists.
     const post = await getPostById(postId);
 
     if (!post) {
       return errorResponse(404, "Post not found");
     }
 
-    // Use the username from the verified JWT.
+    //Use the username from the verified JWT.
     const username = event.user.username;
 
     const comment = await createComment({
