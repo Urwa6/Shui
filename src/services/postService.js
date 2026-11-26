@@ -1,20 +1,28 @@
 import { createPost, getPostById, updatePost, deletePost } from "../database/post.js";
+import { deleteCommentsByPostId } from "../database/comment.js";
 
-// Create a post for a registered user
-export const createNewPost = async ({ username, title, content }) => {
+//Create a post for a registered user or a guest.
+export const createNewPost = async ({
+  username,
+  title,
+  content,
+  isGuest = false,
+}) => {
   return await createPost({
     username,
     title,
     content,
+    isGuest,
   });
 };
 
-// Retrieve one post by its ID
+
+//Retrieve one post by its ID
 export const getPost = async (postId) => {
   return await getPostById(postId);
 };
 
-// Update a post only if the user owns it
+//Update a post only if the user owns it
 export const updateUserPost = async ({
   postId,
   username,
@@ -28,7 +36,7 @@ export const updateUserPost = async ({
     return { error: "Post not found", statusCode: 404 };
   }
 
-  // Check if the logged-in user owns the post
+  //Check if the logged-in user owns the post
   if (existingPost.username !== username || existingPost.isGuest === true) {
     return { 
       error: "You are not allowed to update this post", 
@@ -44,16 +52,16 @@ export const updateUserPost = async ({
 
   return { post: updatedPost };
 };
-// Delete a post only if the user owns it
+//Delete a post only if the user owns it
 export const deleteUserPost = async ({ postId, username }) => {
   const existingPost = await getPostById(postId);
 
-  // Check if the post exists
+  //Check if the post exists
   if (!existingPost) {
     return { error: "Post not found", statusCode: 404 };
   }
 
-  // Check if the logged-in user owns the post
+  //Check if the logged-in user owns the post
   if (existingPost.username !== username || existingPost.isGuest === true) {
     return {
       error: "You are not allowed to delete this post",
@@ -61,6 +69,10 @@ export const deleteUserPost = async ({ postId, username }) => {
     };
   }
 
+  //Delete all comments belonging to this post first.
+  await deleteCommentsByPostId(postId);
+
+  //Then delete the post itself.
   await deletePost(postId);
 
   return { success: true };

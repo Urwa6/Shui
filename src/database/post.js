@@ -46,7 +46,12 @@ export const getAllPosts = async (username) => {
 };
 
 //Create and save a new post in the database
-export const createPost = async ({username, title, content}) => {
+export const createPost = async ({
+  username, 
+  title, 
+  content,
+  isGuest = false,
+}) => {
     const  id = randomUUID();
     const createdAt = new Date().toISOString();
 
@@ -56,7 +61,8 @@ export const createPost = async ({username, title, content}) => {
         title,
         content,
         createdAt,
-        isGuest: false,
+        updatedAt: createdAt,
+        isGuest,
 
         //Attributes used by the DynamoDB indexes 
         GSI1PK: "POSTS",

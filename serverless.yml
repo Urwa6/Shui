@@ -85,9 +85,19 @@ functions:
           path: /posts/{postId}
           method: DELETE
 
+  getComments:
+    handler: src/handlers/comments/getAll.handler
+    events:
+      - httpApi:
+          path: /posts/{postId}/comments
+          method: GET
 
-
-
+  createComment:
+    handler: src/handlers/comments/create.handler
+    events:
+      - httpApi:
+          path: /posts/{postId}/comments
+          method: POST
 
 resources:
   Resources:

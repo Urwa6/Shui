@@ -1,5 +1,7 @@
+
 import middy from "@middy/core";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
 
 import { createNewPost } from "../../services/postService.js";
 import { authenticate } from "../../middleware/auth.js";
@@ -8,13 +10,13 @@ import {
   errorResponse,
 } from "../../utils/response.js";
 
-// Validate the post title and content
+// Validate the post title and content.
 const postSchema = z.object({
   title: z.string().trim().min(1, "Title is required"),
   content: z.string().trim().min(1, "Content is required"),
 });
 
-// Handle POST /posts
+// Handle POST /posts.
 const createPostHandler = async (event) => {
   try {
     let body;
@@ -34,13 +36,17 @@ const createPostHandler = async (event) => {
       );
     }
 
-    // Get username from the verified JWT, not the request body
-    const username = event.user.username;
+    // Use the verified username or generate a guest username.
+    const isGuest = !event.user;
+    const username = isGuest
+      ? `Guest-${randomUUID().slice(0, 8)}`
+      : event.user.username;
 
     const post = await createNewPost({
       username,
       title: validation.data.title,
       content: validation.data.content,
+      isGuest,
     });
 
     return successResponse(201, {
@@ -53,6 +59,6 @@ const createPostHandler = async (event) => {
   }
 };
 
-// Apply authentication before executing the handler
+// Allow guests, but verify any token that is supplied.
 export const handler = middy(createPostHandler)
-  .use(authenticate());
+  .use(authenticate({ optional: true }));
