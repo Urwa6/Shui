@@ -1,13 +1,20 @@
 import { createPost, getPostById, updatePost, deletePost } from "../database/post.js";
 
-// Create a post for a registered user
-export const createNewPost = async ({ username, title, content }) => {
+// Create a post for a registered user or a guest.
+export const createNewPost = async ({
+  username,
+  title,
+  content,
+  isGuest = false,
+}) => {
   return await createPost({
     username,
     title,
     content,
+    isGuest,
   });
 };
+
 
 // Retrieve one post by its ID
 export const getPost = async (postId) => {
