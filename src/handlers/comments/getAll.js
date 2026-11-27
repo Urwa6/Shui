@@ -28,7 +28,14 @@ export const handler = async (event) => {
     //Retrieve comments belonging to this post.
     const comments = await getCommentsByPostId(postId);
 
-    return successResponse(200, comments);
+    const formattedComments = comments.map(
+      ({ commentId, ...comment }) => ({
+        ...comment,
+        id: commentId,
+    })
+    );
+
+    return successResponse(200, formattedComments);
 
   } catch (error) {
     console.error("Get comments error:", error);

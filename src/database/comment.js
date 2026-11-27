@@ -9,7 +9,6 @@ import { dynamoDb } from "./dynamodb.js";
 
 const COMMENTS_TABLE = process.env.COMMENTS_TABLE;
 
-
 export const getCommentsByPostId = async (postId) => {
   const comments = [];
   let lastEvaluatedKey;
@@ -30,8 +29,12 @@ export const getCommentsByPostId = async (postId) => {
     lastEvaluatedKey = result.LastEvaluatedKey;
   } while (lastEvaluatedKey);
 
-  return comments;
+  // Return comments from oldest to newest.
+  return comments.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  );
 };
+
 
 //Create and save a comment.
 export const createComment = async ({
