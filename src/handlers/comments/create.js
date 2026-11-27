@@ -61,10 +61,15 @@ const createCommentHandler = async (event) => {
       content: validation.data.content,
     });
 
+    const { commentId, ...commentData } = comment;
+
     return successResponse(201, {
-      message: "Comment created successfully",
-      comment,
-    });
+    message: "Comment created successfully",
+    comment: {
+     ...commentData,
+    id: commentId,
+    },
+  });
 
   } catch (error) {
     console.error("Create comment error:", error);
